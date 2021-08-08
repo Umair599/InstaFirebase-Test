@@ -61,7 +61,7 @@ const Register = (props)=>{
         address: userAddress,
         password: userPassword,
       };
-    localStorage.set('formValues', formValues);
+    localStorage.setItem('formValues', formValues);
     window.location = `https://api.instagram.com/oauth/authorize?client_id=${INSTAGRAM_APP_ID}&redirect_uri=${REDIRECT_URI}&scope=user_profile,user_media&response_type=code`;
 };
     useEffect(()=>{
@@ -71,7 +71,7 @@ const Register = (props)=>{
           },[code]);
     useEffect(() => {
     if (props.accessToken) {
-        const formValues=localStorage.get('formValues');
+        const formValues=localStorage.getItem('formValues');
         props.signUp(formValues, props.accessToken, props.instaUserId);
     }
           }, [props.accessToken]);
