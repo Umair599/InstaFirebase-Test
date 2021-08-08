@@ -10,15 +10,17 @@ export const signOut = ()=>{
         type: SIGN_OUT
     };
 };
-export const signUp=(formValues, code)=>async (dispatch, getState)=>{
-    dispatch(fetchCode(code));
-    const {accessToken, instaUserId}=getState().auth;
+export const signUp=(formValues, code, instaUserId)=>async (dispatch, getState)=>{
+    
     firebase.auth().createUserWithEmailAndPassword(formValues.email,formValues.password ).then(async (resp) => {
+        console.log('Form Values',formValues);
+        console.log('Accesscode', code);
+        console.log('instaUserId', instaUserId);
         const docRef = firebase.firestore().doc(`/users/${formValues.email}`);
         let user = {};
         user.name = formValues.name;
         user.email = formValues.email;
-        user.accessIGToken= accessToken;
+        user.accessIGToken= code;
         user.instaUserId= instaUserId;
         user.photoURL = resp.user.photoURL;
         user.userName = formValues.age;
@@ -67,7 +69,7 @@ export const fetchCode = code => async dispatch=> {
         console.log(err, 'Error occured while getting shortAccessToken and userId Failed');
     });
 };
-export const fetchLongAccessToken = (token, userId)=>async => {
+export const fetchLongAccessToken = (token, userId)=>async dispatch=> {
     fetch(`${ROOT_URL}/access_token?client_secret=${INSTAGRAM_APP_SECRET}&access_token=${token}&grant_type=ig_exchange_token`).then(response => response.json()).then(res => {
         dispatch({type: ACCESS_TOKEN, payload: {access_token: res.access_token, userId: userId}});
     }).catch(err => {
