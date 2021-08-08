@@ -54,6 +54,13 @@ const Register = (props)=>{
     }
     //Show Loader
     setLoading(true);
+      const formValues = {
+        name: userName,
+        email: userEmail,
+        age: userAge,
+        address: userAddress,
+        password: userPassword,
+      };
     localStorage.set('formValues', formValues);
     window.location = `https://api.instagram.com/oauth/authorize?client_id=${INSTAGRAM_APP_ID}&redirect_uri=${REDIRECT_URI}&scope=user_profile,user_media&response_type=code`;
 };
