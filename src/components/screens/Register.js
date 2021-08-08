@@ -54,21 +54,20 @@ const Register = (props)=>{
     }
     //Show Loader
     setLoading(true);
+    localStorage.set('formValues', formValues);
     window.location = `https://api.instagram.com/oauth/authorize?client_id=${INSTAGRAM_APP_ID}&redirect_uri=${REDIRECT_URI}&scope=user_profile,user_media&response_type=code`;
 };
     useEffect(()=>{
         if(code) {
-            const formValues = {
-                name: userName,
-                email: userEmail,
-                age: userAge,
-                address: userAddress,
-                password: userPassword,
-              };
-            props.signUp(formValues, code);
-          //props.fetchCode(code); 
+          props.fetchCode(code); 
         }
           },[code]);
+    useEffect(() => {
+    if (props.accessToken) {
+        const formValues=localStorage.get('formValues');
+        props.signUp(formValues, props.accessToken, props.instaUserId);
+    }
+          }, [props.accessToken]);
     return(
         <View style={styles.container}>
   <Loader loading={loading} />
@@ -180,7 +179,7 @@ const mapStateToProps=(state)=>{
     return {
       isSignedIn: state.auth.isSignedIn,
       accessToken: state.auth.accessToken,
-      userId: state.auth.userId
+       instaUserId: state.auth.instaUserId
     };
   }
 export default connect(mapStateToProps, {fetchCode, signUp})(Register);
@@ -199,6 +198,12 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginVertical: 5,
         color: '#000000',
+      },
+    SectionStyle: {
+        flexDirection: 'row',
+        flex: 1,
+        height: 20,
+        margin: 10,
       },
       registerButton:{
         flexDirection: 'row',
