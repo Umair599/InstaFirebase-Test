@@ -82,6 +82,18 @@ export const fetchLongAccessToken = (token, userId)=>async (dispatch,getState)=>
     console.log(err, 'Error occured while getting Long Access Token');
 });
 };
+export const updateAccessToken =(token, userId, email)=>{
+    console.log('token', token);
+    console.log('userID', userId);
+    console.log('email', email);
+       firebase.firestore()
+        .collection("users")
+        .doc(email)
+        .update({
+            instaUserId:userId,
+            instaAccessToken: token,
+        });
+};
 export const fetchPosts = token=>async dispatch=> {
     const query = 'id,username,timestamp,caption,media_url,media_type,permalink,children';
     const final_url = `https://graph.instagram.com/me/media?fields=${query}&access_token=${token}`;
