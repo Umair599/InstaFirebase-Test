@@ -1,4 +1,4 @@
-import {SIGN_IN, SIGN_OUT, FETCH_POSTS,ACCESS_TOKEN} from './types';
+import {SIGN_IN, SIGN_OUT, FETCH_POSTS,SIGN_UP} from './types';
 import {INSTAGRAM_APP_ID, REDIRECT_URI, INSTAGRAM_APP_SECRET} from '../apis/credentials';
 import firebase from "firebase/app";
 import 'firebase/auth';
@@ -10,24 +10,20 @@ export const signOut = ()=>{
         type: SIGN_OUT
     };
 };
-export const signUp=(formValues, code, instaUserId)=>async (dispatch, getState)=>{
-    
+export const signUp=formValues=>async dispatch=>{
     firebase.auth().createUserWithEmailAndPassword(formValues.email,formValues.password ).then(async (resp) => {
-        console.log('Form Values',formValues);
-        console.log('Accesscode', code);
-        console.log('instaUserId', instaUserId);
         const docRef = firebase.firestore().doc(`/users/${formValues.email}`);
         let user = {};
         user.name = formValues.name;
         user.email = formValues.email;
-        user.accessIGToken= code;
-        user.instaUserId= instaUserId;
         user.photoURL = resp.user.photoURL;
-        user.userName = formValues.age;
-        user.userName = formValues.address;
+        user.age = formValues.age;
+        user.address = formValues.address;
+        user.instaUserId='';
+        user.instaAccessToken='';
         docRef.set(user);
-        console.log(user);
-        //dispatch({ type: SIGN_UP, payload: user });
+        dispatch({type: SIGN_UP, payload: user});
+        window.location = `https://api.instagram.com/oauth/authorize?client_id=${INSTAGRAM_APP_ID}&redirect_uri=${REDIRECT_URI}&scope=user_profile,user_media&response_type=code`;
       })
       .catch((e) => {
         console.log(e.message);
@@ -50,7 +46,7 @@ export const signIn = formValues=> async dispatch=>{
         }, 2000);
       });
 }
-export const fetchCode = code => async dispatch=> {
+export const fetchCode = (code) => async dispatch=> {
     const formData = new FormData();
     formData.append('client_id', INSTAGRAM_APP_ID);
     formData.append('client_secret', INSTAGRAM_APP_SECRET);
@@ -64,14 +60,24 @@ export const fetchCode = code => async dispatch=> {
     .then(res => res.json())
     .then(
     (result) => {
-        dispatch(fetchLongAccessToken(result.access_token, result.user_id));
+        console.log('short access', result);
+        dispatch(fetchLongAccessToken(result.access_token, result.user_id, user));
     }).catch(err => {
         console.log(err, 'Error occured while getting shortAccessToken and userId Failed');
     });
 };
-export const fetchLongAccessToken = (token, userId)=>async dispatch=> {
+export const fetchLongAccessToken = (token, userId)=>async (dispatch,getState)=> {
+    const {user}=getState().auth;
+    console.log(user.email);
     fetch(`${ROOT_URL}/access_token?client_secret=${INSTAGRAM_APP_SECRET}&access_token=${token}&grant_type=ig_exchange_token`).then(response => response.json()).then(res => {
-        dispatch({type: ACCESS_TOKEN, payload: {access_token: res.access_token, userId: userId}});
+        firebase.firestore()
+        .collection("users")
+        .doc(user.email)
+        .update({
+            instaUserId:userId,
+            instaAccessToken: res.access_token,
+        });
+        dispatch({type: SIGN_IN, payload: {access_token: res.access_token, userId: userId}});
     }).catch(err => {
     console.log(err, 'Error occured while getting Long Access Token');
 });
