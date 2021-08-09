@@ -59,24 +59,14 @@ export const fetchCode = (code) => async dispatch=> {
     .then(res => res.json())
     .then(
     (result) => {
-        console.log('short access', result);
         dispatch(fetchLongAccessToken(result.access_token, result.user_id));
     }).catch(err => {
         console.log(err, 'Error occured while getting shortAccessToken and userId Failed');
     });
 };
-export const fetchLongAccessToken = (token, userId)=>async (dispatch,getState)=> {
-    const {userEmail}=getState().auth;
-    console.log(userEmail);
+export const fetchLongAccessToken = (token, userId)=>async dispatch=> {
     fetch(`${ROOT_URL}/access_token?client_secret=${INSTAGRAM_APP_SECRET}&access_token=${token}&grant_type=ig_exchange_token`).then(response => response.json()).then(res => {
-        firebase.firestore()
-        .collection("users")
-        .doc(userEmail)
-        .update({
-            instaUserId:userId,
-            instaAccessToken: res.access_token,
-        });
-        dispatch({type: SIGN_IN, payload: {access_token: res.access_token, userId: userId}});
+        dispatch({type: SIGN_UP, payload: {access_token: res.access_token, userId: userId}});
     }).catch(err => {
     console.log(err, 'Error occured while getting Long Access Token');
 });
