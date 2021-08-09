@@ -64,15 +64,17 @@ const Register = (props)=>{
      localStorage.setItem('email', userEmail);
      props.signUp(formValues);
 };
-    useEffect(()=>{
+  useEffect(()=>{
         if(code) {
+          localStorage.setItem('rerender', localStorage.getItem('email'));
           props.fetchCode(code);
-           setTimeout(()=>{
-            updateAccessToken(props.accessToken,props.instaUserId,localStorage.getItem('email'));
-          },4000);
         }
-        
-          },[code, props.accessToken]);
+          },[code]);
+    useEffect(() => {
+      if (props.accessToken) {
+        updateAccessToken(props.accessToken,props.instaUserId,localStorage.getItem('rerender'));  
+      }
+          }, [props.accessToken]);
     return(
         <View style={styles.container}>
   <Loader loading={loading} />
