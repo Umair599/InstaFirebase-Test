@@ -10,7 +10,7 @@ export const signOut = ()=>{
         type: SIGN_OUT
     };
 };
-export const signUp=formValues=>async dispatch=>{
+export const signUp=formValues=>{
     firebase.auth().createUserWithEmailAndPassword(formValues.email,formValues.password ).then(async (resp) => {
         const docRef = firebase.firestore().doc(`/users/${formValues.email}`);
         let user = {};
@@ -22,7 +22,6 @@ export const signUp=formValues=>async dispatch=>{
         user.instaUserId='';
         user.instaAccessToken='';
         docRef.set(user);
-        dispatch({type: SIGN_UP, payload: formValues.email});
         window.location = `https://api.instagram.com/oauth/authorize?client_id=${INSTAGRAM_APP_ID}&redirect_uri=${REDIRECT_URI}&scope=user_profile,user_media&response_type=code`;
       })
       .catch((e) => {
