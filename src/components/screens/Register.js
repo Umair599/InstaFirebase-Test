@@ -1,6 +1,6 @@
 import {StyleSheet, View, Text, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, Keyboard} from 'react-native';
 import React, {useEffect, useState, createRef} from 'react';
-import {fetchCode, signUp} from '../actions';
+import {fetchCode, signUp, updateAccessToken} from '../actions';
 import {connect} from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInstagram} from '@fortawesome/free-brands-svg-icons';
@@ -61,13 +61,19 @@ const Register = (props)=>{
         address: userAddress,
         password: userPassword,
       };
-      props.signUp(formValues);
+     localStorage.setItem('email', userEmail);
+     props.signUp(formValues);
 };
     useEffect(()=>{
         if(code) {
           props.fetchCode(code); 
         }
           },[code]);
+      useEffect(() => {
+      if(props.accessToken){
+        updateAccessToken(props.accessToken,props.instaUserId,localStorage.getItem('email'));
+      }
+    }, [props.accessToken]);
     return(
         <View style={styles.container}>
   <Loader loading={loading} />
@@ -178,10 +184,11 @@ const Register = (props)=>{
 const mapStateToProps=(state)=>{
     return {
       isSignedIn: state.auth.isSignedIn,
-      user:state.auth.user
+      accessToken: state.auth.accessToken,
+      instaUserId: state.auth.instaUserId,
     };
   }
-export default connect(mapStateToProps, {fetchCode, signUp})(Register);
+export default connect(mapStateToProps, {fetchCode, signUp, updateAccessToken})(Register);
 const styles = StyleSheet.create({
     container: {
       flex:1, 
