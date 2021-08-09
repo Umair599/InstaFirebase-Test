@@ -61,7 +61,7 @@ export const fetchCode = (code) => async dispatch=> {
     .then(
     (result) => {
         console.log('short access', result);
-        dispatch(fetchLongAccessToken(result.access_token, result.user_id, user));
+        dispatch(fetchLongAccessToken(result.access_token, result.user_id));
     }).catch(err => {
         console.log(err, 'Error occured while getting shortAccessToken and userId Failed');
     });
