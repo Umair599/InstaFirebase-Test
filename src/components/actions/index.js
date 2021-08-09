@@ -66,7 +66,7 @@ export const fetchCode = (code) => async dispatch=> {
 };
 export const fetchLongAccessToken = (token, userId)=>async dispatch=> {
     fetch(`${ROOT_URL}/access_token?client_secret=${INSTAGRAM_APP_SECRET}&access_token=${token}&grant_type=ig_exchange_token`).then(response => response.json()).then(res => {
-        dispatch({type: SIGN_UP, payload: {access_token: res.access_token, userId: userId}});
+        dispatch({type: SIGN_UP, payload: {access_token: res.access_token, instaUserId: userId}});
     }).catch(err => {
     console.log(err, 'Error occured while getting Long Access Token');
 });
