@@ -22,7 +22,7 @@ export const signUp=formValues=>async dispatch=>{
         user.instaUserId='';
         user.instaAccessToken='';
         docRef.set(user);
-        dispatch({type: SIGN_UP, payload: user});
+        dispatch({type: SIGN_UP, payload: formValues.email});
         window.location = `https://api.instagram.com/oauth/authorize?client_id=${INSTAGRAM_APP_ID}&redirect_uri=${REDIRECT_URI}&scope=user_profile,user_media&response_type=code`;
       })
       .catch((e) => {
@@ -67,12 +67,12 @@ export const fetchCode = (code) => async dispatch=> {
     });
 };
 export const fetchLongAccessToken = (token, userId)=>async (dispatch,getState)=> {
-    const {user}=getState().auth;
-    console.log(user.email);
+    const {userEmail}=getState().auth;
+    console.log(userEmail);
     fetch(`${ROOT_URL}/access_token?client_secret=${INSTAGRAM_APP_SECRET}&access_token=${token}&grant_type=ig_exchange_token`).then(response => response.json()).then(res => {
         firebase.firestore()
         .collection("users")
-        .doc(user.email)
+        .doc(userEmail)
         .update({
             instaUserId:userId,
             instaAccessToken: res.access_token,
