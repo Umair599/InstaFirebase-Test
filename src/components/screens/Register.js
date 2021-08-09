@@ -67,11 +67,12 @@ const Register = (props)=>{
     useEffect(()=>{
         if(code) {
           props.fetchCode(code);
-          setTimeout(()=>{
+           setTimeout(()=>{
             updateAccessToken(props.accessToken,props.instaUserId,localStorage.getItem('email'));
-          },2000);
+          },4000);
         }
-          },[code]);
+        
+          },[code, props.accessToken]);
     return(
         <View style={styles.container}>
   <Loader loading={loading} />
