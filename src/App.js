@@ -10,19 +10,24 @@ import PostList from './components/screens/PostList';
 import Explore from './components/screens/Explore';
 import Footer from "./components/screens/Footer";
 import { auth } from './firebase/config';
+import {View} from 'react-native';
+import history from './history';
 const store= createStore(reducers, applyMiddleware(thunk));
 const App = ()=> {
   return (
     <Provider store={store}>
-      <Router>
+      <Router history={history}>
+        <View style={{flex:1, flexDirection:'column'}}>
         <Switch>
           <Route exact path="/" component={Login}/>
           <Route exact path="/register" component={Register}/>
           <Route exact path="/:userId" component={PostList} />
           <Route exact path="/explore/posts" component={Explore}/>
         </Switch>
-      <Footer />
+        <Footer />
+        </View>
       </Router>
+     
     </Provider>
     );
 }
