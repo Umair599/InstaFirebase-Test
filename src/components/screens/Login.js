@@ -3,7 +3,7 @@ import React, {useEffect, useState, createRef} from 'react';
 import {fetchCode, fetchPosts} from '../actions';
 import {connect} from 'react-redux';
 import LoginImage from '../images/social_media.png';
-import {useLocation} from 'react-router-dom';
+import {useLocation, NavLink} from 'react-router-dom';
 import {INSTAGRAM_APP_ID, REDIRECT_URI} from '../apis/credentials';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInstagram} from '@fortawesome/free-brands-svg-icons';
@@ -100,10 +100,8 @@ if(code) {
              <FontAwesomeIcon icon={faInstagram} size="2x" style={{marginInline:15}}/>
             <Text style={styles.loginText}>Login</Text>
           </TouchableOpacity>
-          <Text
-              style={styles.registerTextStyle}
-              onPress={() => console.log('SignUp')}>
-              New Here ? Register
+          <Text style={styles.registerTextStyle}>
+              <NavLink to='/register'> New Here ? Register</NavLink>
             </Text>
             </KeyboardAvoidingView>
       </View>
