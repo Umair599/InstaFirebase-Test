@@ -3,7 +3,7 @@ import {INSTAGRAM_APP_ID, REDIRECT_URI, INSTAGRAM_APP_SECRET} from '../apis/cred
 import firebase from "firebase/app";
 import 'firebase/auth';
 import 'firebase/firestore';
-
+import history from '../../history';
 const ROOT_URL='https://graph.instagram.com';
 export const signOut = ()=>{
     return {
@@ -45,7 +45,7 @@ export const signIn = formValues=> async dispatch=>{
         }, 2000);
       });
 }
-export const fetchCode = (code) => async dispatch=> {
+export const fetchCode = (code, email) => async dispatch=> {
     const formData = new FormData();
     formData.append('client_id', INSTAGRAM_APP_ID);
     formData.append('client_secret', INSTAGRAM_APP_SECRET);
@@ -59,26 +59,29 @@ export const fetchCode = (code) => async dispatch=> {
     .then(res => res.json())
     .then(
     (result) => {
-        dispatch(fetchLongAccessToken(result.access_token, result.user_id));
+        fetch(`${ROOT_URL}/access_token?client_secret=${INSTAGRAM_APP_SECRET}&access_token=${result.access_token}&grant_type=ig_exchange_token`).then(response => response.json()).then(res => {
+            firebase.firestore().collection("users").doc(email).update({
+                instaUserId:result.user_id,
+                instaAccessToken: res.access_token,
+            });
+            dispatch({type: SIGN_UP, payload: {access_token: res.access_token, instaUserId: result.user_id, userEmail: email}});
+
+        }).catch(err => {
+        console.log(err, 'Error occured while getting Long Access Token');
+    });
+        //dispatch(fetchLongAccessToken(result.access_token, result.user_id));
     }).catch(err => {
         console.log(err, 'Error occured while getting shortAccessToken and userId Failed');
     });
 };
-export const fetchLongAccessToken = (token, userId)=>async dispatch=> {
-    fetch(`${ROOT_URL}/access_token?client_secret=${INSTAGRAM_APP_SECRET}&access_token=${token}&grant_type=ig_exchange_token`).then(response => response.json()).then(res => {
-        dispatch({type: SIGN_UP, payload: {access_token: res.access_token, instaUserId: userId}});
-    }).catch(err => {
-    console.log(err, 'Error occured while getting Long Access Token');
-});
-};
+// export const fetchLongAccessToken = (token, userId)=>async dispatch=> {
+   
+// };
 export const updateAccessToken =(token, userId, email)=>{
     console.log('token', token);
     console.log('userID', userId);
     console.log('email', email);
-       firebase.firestore()
-        .collection("users")
-        .doc(email)
-        .update({
+       firebase.firestore().collection("users").doc(email).update({
             instaUserId:userId,
             instaAccessToken: token,
         });
