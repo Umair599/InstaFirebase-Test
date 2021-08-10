@@ -4,13 +4,10 @@ import {fetchCode, signUp, updateAccessToken} from '../actions';
 import {connect} from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInstagram} from '@fortawesome/free-brands-svg-icons';
-import { faLock, faAt } from '@fortawesome/free-solid-svg-icons';
-import {INSTAGRAM_APP_ID, REDIRECT_URI} from '../apis/credentials';
+import { faLock, faAt, faUser, faUsers,faLocationArrow } from '@fortawesome/free-solid-svg-icons';
 import Loader from '../utilities/Loader';
 import {useLocation} from 'react-router-dom';
-
 import SocialImage from '../images/social_media_img.jpg';
-
 import InstaImage from '../images/insta_image.png';
 const {width, height} = Dimensions.get('window');
 
@@ -61,32 +58,27 @@ const Register = (props)=>{
         address: userAddress,
         password: userPassword,
       };
-     localStorage.setItem('email', userEmail);
-     props.signUp(formValues);
+      localStorage.setItem('email', userEmail);
+      props.signUp(formValues);
 };
-  useEffect(()=>{
+    useEffect(()=>{
         if(code) {
-          localStorage.setItem('rerender', localStorage.getItem('email'));
-          props.fetchCode(code);
+          props.fetchCode(code, localStorage.getItem('email'));
         }
           },[code]);
-    useEffect(() => {
-      if (props.accessToken) {
-        updateAccessToken(props.accessToken,props.instaUserId,localStorage.getItem('rerender'));  
-      }
-          }, [props.accessToken]);
+
     return(
         <View style={styles.container}>
   <Loader loading={loading} />
   <Text style={styles.welcome}>Welcome to Insta-UK App</Text>
-  <View style={{flexDirection: 'row', justifyContent:'space-around'}}>
-  <Image source={SocialImage} style={{resizeMode: 'contain', width: width*0.5, height: height*0.6}} />
-  <View style={{flexDirection: 'column', marginVertical: 10, alignContent:'center', backgroundColor:'#fafafa', borderWidth: 1,
-          borderColor: 'black',alignSelf:'center',width: width*0.4,
-          borderRadius: 10, padding: 5}}>
+  <View style={styles.mainRowSection}>
+  <Image source={SocialImage} style={styles.registerImage} resizeMode={'contain'}/>
+  <View style={styles.registerSection}>
           <KeyboardAvoidingView enabled>
-          <Image source={InstaImage} style={{resizeMode: 'contain', width: 100, height: 50, alignSelf:'center'}} />
+          <Image source={InstaImage} style={styles.brandImage} resizeMode={'contain'}/>
           <View style={styles.SectionStyle}>
+          <View style={styles.iconView}>
+          <FontAwesomeIcon icon={faUser} size="1x"/></View>
             <TextInput
               style={styles.inputStyle}
               onChangeText={UserName => setUserName(UserName)}
@@ -101,7 +93,51 @@ const Register = (props)=>{
               blurOnSubmit={false}
             />
           </View>
+       
           <View style={styles.SectionStyle}>
+          <View style={{alignSelf:'center',flex:0.4}}>
+          <FontAwesomeIcon icon={faUsers} size="1x"/></View>
+            <TextInput
+              style={{flex:6,
+                paddingLeft: 4,
+                borderWidth: 1,
+                borderRadius: 8,
+                marginStart: 4,
+                marginRight:2,
+                height: height*0.05,
+                width:width*0.376}}
+              onChangeText={UserAge => setUserAge(UserAge)}
+              underlineColorAndroid="#f000"
+              placeholder="Enter Age"
+              placeholderTextColor="#8b9cb5"
+              keyboardType="numeric"
+              ref={ageInputRef}
+              returnKeyType="next"
+              onSubmitEditing={() =>
+                addressInputRef.current && addressInputRef.current.focus()
+              }
+              blurOnSubmit={false}
+            />
+          </View>
+          <View style={styles.SectionStyle}>
+          <View style={styles.iconView}>
+          <FontAwesomeIcon icon={faLocationArrow} size="1x"/></View>
+            <TextInput
+              style={styles.inputStyle}
+              onChangeText={UserAddress => setUserAddress(UserAddress)}
+              underlineColorAndroid="#f000"
+              placeholder="Enter Address"
+              placeholderTextColor="#8b9cb5"
+              autoCapitalize="sentences"
+              ref={addressInputRef}
+              returnKeyType="next"
+              onSubmitEditing={Keyboard.dismiss}
+              blurOnSubmit={false}
+            />
+          </View>
+          <View style={styles.SectionStyle}>
+          <View style={styles.iconView}>
+          <FontAwesomeIcon icon={faAt} size="1x"/></View>
             <TextInput
               style={styles.inputStyle}
               onChangeText={UserEmail => setUserEmail(UserEmail)}
@@ -118,6 +154,8 @@ const Register = (props)=>{
             />
           </View>
           <View style={styles.SectionStyle}>
+            <View style={styles.iconView}>
+          <FontAwesomeIcon icon={faLock} size="1x"/></View>
             <TextInput
               style={styles.inputStyle}
               onChangeText={UserPassword => setUserPassword(UserPassword)}
@@ -133,48 +171,9 @@ const Register = (props)=>{
               blurOnSubmit={false}
             />
           </View>
-          <View style={styles.SectionStyle}>
-            <TextInput
-              style={styles.inputStyle}
-              onChangeText={UserAge => setUserAge(UserAge)}
-              underlineColorAndroid="#f000"
-              placeholder="Enter Age"
-              placeholderTextColor="#8b9cb5"
-              keyboardType="numeric"
-              ref={ageInputRef}
-              returnKeyType="next"
-              onSubmitEditing={() =>
-                addressInputRef.current && addressInputRef.current.focus()
-              }
-              blurOnSubmit={false}
-            />
-          </View>
-          <View style={styles.SectionStyle}>
-            <TextInput
-              style={styles.inputStyle}
-              onChangeText={UserAddress => setUserAddress(UserAddress)}
-              underlineColorAndroid="#f000"
-              placeholder="Enter Address"
-              placeholderTextColor="#8b9cb5"
-              autoCapitalize="sentences"
-              ref={addressInputRef}
-              returnKeyType="next"
-              onSubmitEditing={Keyboard.dismiss}
-              blurOnSubmit={false}
-            />
-          </View>
-
-          <TouchableOpacity activeOpacity={0.2} style={{flex:1, cursor: 'pointer', flexWrap:'no-wrap', alignSelf:'center', marginVertical:10}} onPress={handleSubmitButton} >
-            <View style={styles.registerButton}>
-             <FontAwesomeIcon icon={faInstagram} size="2x" style={{marginInline:15}}/>
+          <TouchableOpacity style={styles.registerButton} onPress={handleSubmitButton} >
+             <FontAwesomeIcon icon={faInstagram} style={{marginInline:5,alignSelf:'center'}}/>
             <Text style={styles.registerText}>Regitser</Text>
-            </View>
-
-            <Text
-              style={styles.registerTextStyle}
-              onPress={() => console.log('SignUp')}>
-              Already Register! Go to Login
-            </Text>
           </TouchableOpacity>
           </KeyboardAvoidingView>
 </View>
@@ -185,11 +184,9 @@ const Register = (props)=>{
 const mapStateToProps=(state)=>{
     return {
       isSignedIn: state.auth.isSignedIn,
-      accessToken: state.auth.accessToken,
-      instaUserId: state.auth.instaUserId,
     };
   }
-export default connect(mapStateToProps, {fetchCode, signUp, updateAccessToken})(Register);
+export default connect(mapStateToProps, {fetchCode, signUp})(Register);
 const styles = StyleSheet.create({
     container: {
       flex:1, 
@@ -206,21 +203,81 @@ const styles = StyleSheet.create({
         marginVertical: 5,
         color: '#000000',
       },
+      mainRowSection:{
+        flexDirection: 'row',
+        height: height*0.78,
+        width:width*0.98,
+        alignSelf:'center',
+        marginHorizontal:2,
+      },
+      registerImage:{
+        flex:1.4,
+        alignSelf:'center',
+        height:400,
+        flexDirection:'column'
+        
+      },
+      registerSection:{
+        flexDirection: 'column',
+        marginVertical: 1,
+        alignContent:'center',
+        backgroundColor:'#fafafa',
+        borderWidth: 1,
+        borderColor: 'black',
+        alignSelf:'center',
+        borderRadius: 10,
+        padding: 4,
+        flex:1,
+        flexShrink:true,
+        flexWrap:'wrap'
+      },
+      brandImage:{
+        height: 50,
+        width:150,
+        alignSelf:'center',
+        marginVertical:5
+      },
       SectionStyle: {
         flexDirection: 'row',
-        flex: 1,
-        height: 20,
-        margin: 10,
+        marginTop: 7,
+        justifyContent:'center',
+        flex:1,
+        alignContent:'center',
+        alignSelf:'center',
       },
+     iconView:{
+      alignSelf:'center',
+      flex:0.4
+    },
+      inputStyle: {
+        flex:6,
+        paddingLeft: 4,
+        borderWidth: 1,
+        borderRadius: 8,
+        marginStart: 4,
+        marginRight:2,
+        height: height*0.05,
+        width:width*0.38,
+      },
+     
       registerButton:{
-        flexDirection: 'row',
-        justifyContent: 'center', 
+        flexDirection: 'row', 
+        justifyContent: 'center',
         alignContent:'center',
         backgroundColor: '#b2dffc',
         alignItems: 'center',
         borderWidth: 1,
         borderColor: 'black',
         borderRadius: 10,
-        paddingHorizontal:40, paddingVertical:10, height: 40, width: 120
+        paddingHorizontal:2,
+        paddingVertical:1,
+        height: height*0.045,
+        cursor: 'pointer',
+        flexWrap:'no-wrap', 
+        alignSelf:'center',
+        marginVertical:10,
+      },
+      registerText:{
+         fontWeight: '600',textAlign:'center', marginRight:2, paddingRight:2
       },
 });
